@@ -1,37 +1,21 @@
 <script setup>
-import { ref } from 'vue'
+import { collection, getDocs, getFirestore } from 'firebase/firestore'
+import { ref, onMounted } from 'vue'
 import MateriaComponent from '../components/MateriaComponent.vue'
 
-const materias = ref([
-  {
-    title: 'Título de la materia',
-    professor: 'Cristiano Ronaldo',
-    classroom: 'La Congeladora',
-    days: ['Lunes', 'Miercoles', 'Viernes'],
-    schedule: '7:00 - 9:00'
-  },
-  {
-    title: 'Título de la materia',
-    professor: 'Cristiano Ronaldo',
-    classroom: 'La Congeladora',
-    days: ['Lunes'],
-    schedule: '7:00 - 9:00'
-  },
-  {
-    title: 'Título de la materia',
-    professor: 'Cristiano Ronaldo',
-    classroom: 'La Congeladora',
-    days: ['Lunes', 'Miercoles'],
-    schedule: '7:00 - 9:00'
-  },
-  {
-    title: 'Título de la materia',
-    professor: 'Cristiano Ronaldo',
-    classroom: 'La Congeladora',
-    days: ['Lunes', 'Miercoles', 'Viernes'],
-    schedule: '7:00 - 9:00'
-  }
-])
+const db = getFirestore()
+
+const materias = ref([])
+
+onMounted(async () => {
+  // const user = await signInWithEmailAndPassword(auth, 'myuser@test.com', 'password')
+  const querySnapshot = await getDocs(collection(db, 'materias'))
+  const data = []
+  querySnapshot.forEach((doc) => {
+    data.push(doc.data())
+  })
+  materias.value = data
+})
 </script>
 
 <template>

@@ -1,3 +1,6 @@
+import './firebase.js'
+import './globalState.js'
+
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
