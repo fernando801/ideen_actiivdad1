@@ -25,8 +25,8 @@ const termsAndConditions = ref(false)
 
 const isFormValid = ref(false)
 
-const alert = ref(false)
-const alertData = ref({
+const alert = ref({
+  display: false,
   title: 'Los datos introducidos no son válidos',
   message: 'Favor de verificar que los datos introducidos sean correctos',
   type: 'warning'
@@ -34,8 +34,8 @@ const alertData = ref({
 
 async function submit() {
   if (!isFormValid.value) {
-    alert.value = true
-    alertData.value = {
+    alert.value = {
+      display: true,
       title: 'Los datos introducidos no son válidos',
       message: 'Favor de verificar que los datos introducidos sean correctos',
       type: 'warning'
@@ -51,16 +51,17 @@ async function submit() {
       formData.value.password
     )
     const db = getFirestore()
-    const { password, passwordConfirmation, ...data } = formData.value
+    const { password, passwordConfirmation, ...data } = formData.value // eslint-disable-line
     await setDoc(doc(db, 'users', userCredential.user.uid), data)
 
     session.user = auth.currentUser
+    alert.value.display = false
     router.push('/')
   } catch {
-    alert.value = true
-    alertData.value = {
+    alert.value = {
+      display: true,
       title: 'No se pudo crear la cuenta',
-      message: 'El correo institucional ya cuenta con una cuenta asociada',
+      message: 'El correo institucional probablemente ya cuente con una cuenta asociada',
       type: 'error'
     }
   }
@@ -139,13 +140,13 @@ async function submit() {
       :rules="[(v) => !!v || 'Por favor, acepte los términos y condiciones']"
     ></v-checkbox>
     <!-- <br /> -->
-    <!-- <v-alert v-model="alert" :type="alertData.type" closable>{{ alertData.message }}</v-alert> -->
+    <!-- <v-alert v-model="alert.display" :type="alert.type" closable>{{ alert.message }}</v-alert> -->
     <!-- <br /> -->
-    <v-dialog v-model="alert">
+    <v-dialog v-model="alert.display">
       <v-sheet class="pa-8 mx-auto" width="100%" max-width="800" elevation="2" rounded="xl">
-        <h3 class="dialog_title">{{ alertData.title }}</h3>
+        <h3 class="dialog_title">{{ alert.title }}</h3>
         <div class="dialog_info">
-          <p>{{ alertData.message }}</p>
+          <p>{{ alert.message }}</p>
         </div>
         <v-row>
           <v-spacer />
@@ -153,7 +154,7 @@ async function submit() {
             class="font-weight-bold text-h6"
             color="#384FFE"
             variant="text"
-            @click="alert = false"
+            @click="alert.display = false"
             >CERRAR</v-btn
           >
         </v-row>

@@ -6,15 +6,15 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const credentials = ref({
+const formData = ref({
   email: '',
   password: ''
 })
 
 const isFormValid = ref(false)
 
-const alert = ref(false)
-const alertData = ref({
+const alert = ref({
+  display: false,
   title: 'Los datos introducidos no son válidos',
   message: 'Favor de introducir un correo institucional y contraseña válidos',
   type: 'warning'
@@ -22,8 +22,8 @@ const alertData = ref({
 
 async function submit() {
   if (!isFormValid.value) {
-    alert.value = true
-    alertData.value = {
+    alert.value = {
+      display: true,
       title: 'Los datos introducidos no son válidos',
       message: 'Favor de introducir un correo institucional y contraseña válidos',
       type: 'warning'
@@ -33,19 +33,18 @@ async function submit() {
 
   try {
     const auth = getAuth()
-    await signInWithEmailAndPassword(auth, credentials.value.email, credentials.value.password)
+    await signInWithEmailAndPassword(auth, formData.value.email, formData.value.password)
     session.user = auth.currentUser
-    alert.value = false
+    alert.value.display = false
     router.push('/')
   } catch (e) {
-    alert.value = true
-
     const message =
       e.code === 'auth/wrong-password'
         ? 'La contraseña es incorrecta'
         : 'El correo no cuenta con una cuenta asociada'
 
-    alertData.value = {
+    alert.value = {
+      display: true,
       title: 'No se pudo iniciar sesión',
       message,
       type: 'error'
@@ -57,7 +56,7 @@ async function submit() {
   <h1 class="mt-8 mb-16">INICIO DE SESÍON</h1>
   <v-form v-model="isFormValid" @submit.prevent="submit">
     <v-text-field
-      v-model="credentials.email"
+      v-model="formData.email"
       type="email"
       label="Correo Institucional"
       placeholder="a01234567@tec.mx"
@@ -70,21 +69,21 @@ async function submit() {
       ]"
     ></v-text-field>
     <v-text-field
-      v-model="credentials.password"
+      v-model="formData.password"
       type="password"
       label="Contraseña"
       :rules="[(v) => v.length >= 6 || 'Mínimo 6 caracteres']"
     ></v-text-field>
     <!-- <br /> -->
-    <!-- <v-alert v-model="alert" :type="alertData.type" closable :title="alertData.title"> -->
-    <!--   {{ alertData.message }} -->
+    <!-- <v-alert v-model="alert.display" :type="alert.type" closable :title="alert.title"> -->
+    <!--   {{ alert.message }} -->
     <!-- </v-alert> -->
     <br />
-    <v-dialog v-model="alert">
+    <v-dialog v-model="alert.display">
       <v-sheet class="pa-8 mx-auto" width="100%" max-width="800" elevation="2" rounded="xl">
-        <h3 class="dialog_title">{{ alertData.title }}</h3>
+        <h3 class="dialog_title">{{ alert.title }}</h3>
         <div class="dialog_info">
-          <p>{{ alertData.message }}</p>
+          <p>{{ alert.message }}</p>
         </div>
         <v-row>
           <v-spacer />
@@ -92,7 +91,7 @@ async function submit() {
             class="font-weight-bold text-h6"
             color="#384FFE"
             variant="text"
-            @click="alert = false"
+            @click="alert.display = false"
             >CERRAR</v-btn
           >
         </v-row>
