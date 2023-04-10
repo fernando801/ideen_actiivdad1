@@ -1,5 +1,5 @@
-import './globalState.js'
-import './firebase.js'
+import { persistence, auth } from './firebase.js'
+import { session } from './globalState.js'
 
 // Vuetify
 import 'vuetify/styles'
@@ -26,10 +26,10 @@ const vuetify = createVuetify({
   }
 })
 
-const app = createApp(App)
-
-app.use(router)
-
-app.use(vuetify)
-
-app.mount('#app')
+persistence.then(() => {
+  session.user = auth.currentUser
+  const app = createApp(App)
+  app.use(router)
+  app.use(vuetify)
+  app.mount('#app')
+})
