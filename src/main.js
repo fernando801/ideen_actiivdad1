@@ -1,5 +1,5 @@
-import './firebase.js'
 import './globalState.js'
+import './firebase.js'
 
 // Vuetify
 import 'vuetify/styles'
